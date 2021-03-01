@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My first Leaflet map</title>  
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="main.css"/>
+  </head>
+  
+  <body>
+    <H1>Hello World</H1>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.5.0/proj4.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4leaflet/1.0.2/proj4leaflet.js"></script>
+	<script>
+	//add geoJSON
+	const mygeoJSON =
+	{
+	  "type": "FeatureCollection",
+	  "features": [
+		{
+		  "type": "Feature",
+		  "properties": {},
+		  "geometry": {
+			"type": "Polygon",
+			"coordinates": [
+			  [
+				[
+				  5.667614936828613,
+				  51.967459219999604
+				],
+				[
+				  5.6793737411499015,
+				  51.96455066771293
+				],
+				[
+				  5.681047439575195,
+				  51.96904562350939
+				],
+				[
+				  5.667614936828613,
+				  51.967459219999604
+				]
+			  ]
+			]
+		  }
+		}
+	  ]
+	}
+	
+	// add new CRS
+	const RDnew = new L.Proj.CRS( 'EPSG:28992','+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +no_defs',
+		{
+			resolutions: [3440.640, 1720.320, 860.160, 430.080, 215.040, 107.520, 53.760, 26.880, 13.440, 6.720, 3.360, 1.680, 0.840, 0.420, 0.210],
+			bounds: L.bounds([-285401.92, 22598.08], [595401.9199999999, 903401.9199999999]),
+			origin: [-285401.92, 22598.08]
+		}
+	);
+	
+	// initialize
+	const map = L.map('map', {
+		crs: RDnew,
+		zoom: 9, //Zoom scale RD new
+		center: [51.9741, 5.6688] //webmercator coördinaten
+	}
+	);
+	L.geoJSON(mygeoJSON).addTo(map);
+	
+	// add basemap
+	const pdokachtergrondkaart = new L.TileLayer('http://geodata.nationaalgeoregister.nl/tms/1.0.0/brtachtergrondkaart/{z}/{x}/{y}.png', {
+		minZoom: 0,
+		maxZoom: 13,
+		tms: true,
+		attribution: 'Map data: <a href="http://www.kadaster.nl">Kadaster</a>'
+	});
+
+	pdokachtergrondkaart.addTo(map);
+	
+	//add wms layer
+	const cbs = L.tileLayer.wms('https://geodata.nationaalgeoregister.nl/wijkenbuurten2018/wms', {
+        'layers': 'cbs_buurten_2018',
+        'styles': 'wijkenbuurten2018:buurt_aantal_personenautos_jonger_dan_6_jaar',
+        'srs': 'EPSG:28992',
+        'format': 'image/png',
+        'transparent': true
+    }).addTo(map);
+	
+	
+	
+	// add markers
+	let forum = L.marker([51.98514,5.6647]).addTo(map);
+	let huis = L.marker([51.96857412,5.68099022]).addTo(map);
+	let appie = L.marker([51.97001286,5.66805303]).addTo(map);
+
+	// add popups
+	let popup = "Kijk Forum!";
+	forum.bindPopup(popup);
+	let popup1 = "huis";
+	huis.bindPopup(popup1);
+	let popup2 = "appie";
+	appie.bindPopup(popup2);
+	
+	//circle
+	let circle =  L.circle([51.98531, 5.66361], 500, {
+	  color: 'red',
+	  fillColor: '#f03',
+	  fillOpacity: 0.5
+	}).addTo(map);
+	
+	//polygon
+	let polygon = L.polygon(
+	[[
+		[51.98514,5.6647],
+		[51.96857412,5.68099022],
+		[51.97001286,5.66805303],
+		[51.98514,5.6647]
+	]]).addTo(map);
+	
+	</script>
+  </body>
+</html>
